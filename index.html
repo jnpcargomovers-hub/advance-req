@@ -16,19 +16,27 @@
     
     <!-- Top Bar with Logo & Navigation -->
     <div class="border-b border-slate-200 pb-3 mb-4 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <img 
-          src="logo.png" 
-          alt="JNP Cargo Movers" 
-          class="h-11 sm:h-12 w-auto object-contain"
-          onerror="this.onerror=null; this.src='https://placehold.co/120x45/002b66/ffffff?text=JNP+CARGO';"
-        />
+      <div class="flex items-center gap-2.5">
+        <!-- Logo Image with Clean Inline Brand Fallback -->
+        <div class="flex-shrink-0">
+          <img 
+            id="brandLogo"
+            src="logo.png" 
+            alt="JNP Cargo Movers" 
+            class="h-11 w-auto object-contain"
+            onerror="document.getElementById('brandLogo').classList.add('hidden'); document.getElementById('brandFallback').classList.remove('hidden');"
+          />
+          <div id="brandFallback" class="hidden h-11 w-14 bg-blue-950 rounded-xl flex flex-col items-center justify-center text-white shadow-sm">
+            <span class="font-black text-sm italic tracking-tighter leading-none">JNP</span>
+            <span class="text-[7px] font-bold text-amber-400 tracking-wider">CARGO</span>
+          </div>
+        </div>
         <div class="border-l border-slate-200 pl-2.5">
-          <h1 class="text-xs sm:text-sm font-extrabold text-amber-700 tracking-tight leading-tight uppercase">ADVANCE PAYMENT</h1>
+          <h1 class="text-xs sm:text-sm font-extrabold text-amber-800 tracking-tight leading-tight uppercase">ADVANCE PAYMENT</h1>
           <p class="text-[10px] text-slate-500 font-semibold tracking-wider">एडवांस पेमेंट रिक्वेस्ट</p>
         </div>
       </div>
-      <button type="button" onclick="fetchMasters()" class="text-xs text-amber-700 font-bold hover:underline py-1 px-2.5 rounded-lg bg-amber-50 border border-amber-200">↻ Sync</button>
+      <button type="button" onclick="fetchMasters()" class="text-xs text-amber-800 font-bold hover:underline py-1 px-2.5 rounded-lg bg-amber-50 border border-amber-200">↻ Sync</button>
     </div>
 
     <!-- Active Form -->
@@ -107,7 +115,7 @@
       <!-- Remark -->
       <div>
         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">7. Remark / Purpose</label>
-        <input type="text" id="remarkInput" placeholder="Reason (e.g. En-route emergency, Toll cash, Family medical)" class="w-full border rounded-xl p-2.5 bg-slate-50 font-medium" />
+        <input type="text" id="remarkInput" placeholder="Reason (e.g. En-route emergency, Toll cash)" class="w-full border rounded-xl p-2.5 bg-slate-50 font-medium" />
       </div>
 
       <!-- Submit Button -->
@@ -138,36 +146,67 @@
   </div>
 
   <script>
-    // PASTE YOUR JNP_Advance_DB WEB APP URL HERE
-    const SCRIPT_URL = "https://script.google.com/macros/s/PASTE_YOUR_ADVANCE_EXEC_URL_HERE/exec";
+    // Live Web App URL for Advance Payment Request
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGTv6YBnyXJ8SEMFTEVmkupwLdNC2f3-PcT2NLexc325Z2lDcAAjR4QHPs8eA7inze8g/exec";
 
     let lastSavedData = null;
 
+    // Initial Master Data calibrated directly with your live Google Sheet
     let masterData = {
-      staff: ["Atul", "Hemant", "Akshay", "Ganesh", "Rahul", "Satish", "Chetan", "Sumit"],
-      drivers: ["AKIL KHAN","SHAKIL KHAN","FEROZ KHAN","SANJAY KHABRE","DEVIDAS PATIL","PRAMOD SONWANE","MD IBARAR","RAHUL PAL","RAJESH SHARMA","KRISHNAKUMAR SAHU","RANJIT SONI","BHATU MAHALE","ABDULLAH","MAHENDRA VISHWAKARMA","PRAVIN BHOIR","SINTU YADAV","SUNIL SAHU","OMPRAKASH SAHU","ASHOK SAHU","MD SAGEER","TINKU YADAV","MD MIRAJ","SHOEB PATHAN","KAILASH PATIL","javed ali","asif shaikh","samadhan patil","yunus ansari","ISHWAR BHILL","MAHMOOD KHAN","SHARUKH KHTIK","RAHUL PAAL","MIRAJ AHMED","samadhan kadam","MOHSIN KHAN"],
-      trucks: ["MH40CM8975","MH40BL4725","MH18BZ0274","MH40CM1550","MH18BZ0106","MH18BZ0107","MH14KA9717","MH40CM2748","MH40DC1236","MH18BZ0112","MH40CM1569","OD01AB2773","UP95T9393","MH40CM1570","CG07CG1594","MH18BZ0105","MH18BZ0109","OD01AB2873","AP04UB2935","CG07CG1595","CG07CG1596","MH21BH4147","MH18BZ0268","MH18BZ0269","MH18BZ0271","MH18BZ0272","MH18BG8250","MH18BG8251","MH18BG8252","MH18BZ0110","MH18BZ0113","MH18BZ0267","CG07CG2120","MH18BG8256","MH18BG8257","MH18BZ0108","MH18BZ0270","MH18BZ0275","MH18BG8253","MH40CM2747","MH40CM2746","MH40CD4841","MH40CM7805","OD04M6659","CG07CG1597","MH40CM0731","MH18BZ0273","MH18BZ0276"],
-      guarantors: ["Atul", "Hemant", "Self", "Branch Manager"]
+      staff: ["Sumit", "Ganesh", "Atul", "Ganesh HO"],
+      drivers: [
+        "Akil Khan", "Shakil Khan", "Feroz Khan", "Sanjay Khabre", "Devidas Patil",
+        "Pramod Sonwane", "Md Ibarar", "Rahul Pal", "Rajesh Sharma", "Krishnakumar Sahu",
+        "Ranjit Soni", "Bhatu Mahale", "Abdullah", "Mahendra Vishwakarma", "Pravin Bhoir",
+        "Sintu Yadav", "Sunil Sahu", "Omprakash Sahu", "Ashok Sahu", "Md Sageer",
+        "Tinku Yadav", "Md Miraj", "Shoeb Pathan", "Kailash Patil"
+      ],
+      trucks: [
+        "MH40CM8975", "MH40BL4725", "MH18BZ0274", "MH40CM1550", "MH18BZ0106",
+        "MH18BZ0107", "MH14KA9717", "MH40CM2748", "MH40DC1236", "MH18BZ0112",
+        "MH40CM1569", "OD01AB2773", "UP95T9393", "MH40CM1570", "CG07CG1594",
+        "MH18BZ0105", "MH18BZ0109", "OD01AB2873", "AP04UB2935", "CG07CG1595",
+        "CG07CG1596", "MH21BH4147", "MH18BZ0268", "MH18BZ0269"
+      ],
+      guarantors: ["Sumit", "Ganesh", "Atul", "Branch Manager", "Self"]
     };
 
     window.addEventListener('DOMContentLoaded', () => {
-      // Default credit date to today
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('dateOfCredit').value = today;
+      populateStaff(masterData.staff);
       fetchMasters();
     });
 
     async function fetchMasters() {
-      populateStaff(masterData.staff);
       try {
-        const res = await fetch(SCRIPT_URL, { method: "GET" });
+        const res = await fetch(SCRIPT_URL, {
+          method: "GET",
+          headers: { "Accept": "application/json" }
+        });
+
         if (res.ok) {
           const liveData = await res.json();
-          masterData = liveData;
-          populateStaff(masterData.staff);
+          if (liveData) {
+            if (Array.isArray(liveData.staff) && liveData.staff.length > 0) {
+              masterData.staff = liveData.staff;
+              populateStaff(masterData.staff);
+            }
+            if (Array.isArray(liveData.drivers) && liveData.drivers.length > 0) {
+              masterData.drivers = liveData.drivers;
+            }
+            if (Array.isArray(liveData.trucks) && liveData.trucks.length > 0) {
+              masterData.trucks = liveData.trucks;
+            }
+            if (Array.isArray(liveData.guarantors) && liveData.guarantors.length > 0) {
+              masterData.guarantors = liveData.guarantors;
+            }
+            showToast("Synced with Google Sheet Masters!", "emerald");
+            setTimeout(hideToast, 2000);
+          }
         }
       } catch (e) {
-        console.log("Cached masters ready");
+        console.warn("Using offline master cache", e);
       }
     }
 
@@ -293,7 +332,6 @@
       }
     }
 
-    // Advance Payment Request WhatsApp Template
     function handleWhatsAppShare() {
       if (!lastSavedData) return;
 
